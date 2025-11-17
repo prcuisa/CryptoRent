@@ -1,9 +1,5 @@
 'use client'
-// Pastikan import Shield bener:
-import { Shield } from 'lucide-react'
-// atau coba alternatif:
-import { ShieldCheck } from 'lucide-react'
-import { ShieldAlert } from 'lucide-react'
+
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -27,7 +23,8 @@ import {
   FileText,
   RefreshCw,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react'
 
 interface Transaction {

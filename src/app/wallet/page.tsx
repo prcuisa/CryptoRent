@@ -6,11 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { Download } from 'lucide-react'
-// atau
-import { ArrowDownToLine } from 'lucide-react' 
-// atau
-import { ArrowDownCircle } from 'lucide-react'
 import { 
   Bitcoin, 
   Wallet, 
