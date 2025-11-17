@@ -1,0 +1,17 @@
+version: 2
+name: cryptorent
+
+build:
+  context:
+    apiDir: "src/app/api"
+    packagesToInstall:
+      - "@prisma/client"
+      - "prisma"
+
+run:
+  context:
+    apiDir: "src/app/api"
+
+environment:
+  NEXTAUTH_URL: ${{ urls.primary }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
