@@ -1,0 +1,185 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String
+  role            UserRole  @default(TENANT)
+  walletAddress   String?   @unique
+  avatar          String?
+  rating          Float     @default(0)
+  totalProperties Int       @default(0)
+  totalTransactions Int     @default(0)
+  totalRevenue    Float     @default(0)
+  totalBookings   Int       @default(0)
+  totalSpent      Float     @default(0)
+  isVerified      Boolean   @default(false)
+  kycStatus       KycStatus @default(PENDING)
+  riskAssessment  String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  properties      Property[]
+  bookings        Booking[]
+  transactions    Transaction[]
+  propertyReviews Review[]
+
+  @@map("users")
+}
+
+model Property {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  location    String
+  price       Float
+  currency    String      @default("ETH")
+  bedrooms    Int
+  bathrooms   Int
+  area        Int
+  type        PropertyType
+  images      String      @default("")
+  rating      Float       @default(0)
+  reviewCount Int         @default(0)
+  available   Boolean     @default(true)
+  amenities   String      @default("")
+  landlordId  String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  landlord    User        @relation(fields: [landlordId], references: [id])
+  bookings    Booking[]
+  transactions Transaction[]
+  propertyReviews Review[]
+
+  @@map("properties")
+}
+
+model Booking {
+  id             String       @id @default(cuid())
+  propertyId     String
+  propertyTitle  String
+  tenantId       String
+  tenantName     String
+  landlordId     String
+  landlordName   String
+  checkIn        DateTime
+  checkOut       DateTime
+  status         BookingStatus @default(PENDING)
+  amount         Float
+  currency       String       @default("ETH")
+  securityDeposit Float       @default(0)
+  totalPaid      Float        @default(0)
+  smartContractTerms String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Relations
+  property       Property     @relation(fields: [propertyId], references: [id])
+  tenant         User         @relation(fields: [tenantId], references: [id])
+  transactions   Transaction[]
+
+  @@map("bookings")
+}
+
+model Transaction {
+  id           String           @id @default(cuid())
+  type         TransactionType
+  amount       Float
+  currency     String           @default("ETH")
+  status       TransactionStatus @default(PENDING)
+  date         DateTime
+  propertyId   String?
+  property     String?
+  tenantId     String?
+  tenant       String?
+  landlordId   String?
+  landlord     String?
+  txHash       String?          @unique
+  gas          Float?
+  blockNumber  Int?
+  bookingId    String?
+  createdAt    DateTime         @default(now())
+
+  // Relations
+  propertyRef  Property?        @relation(fields: [propertyId], references: [id])
+  booking      Booking?         @relation(fields: [bookingId], references: [id])
+  user         User?            @relation(fields: [tenantId], references: [id])
+
+  @@map("transactions")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  propertyId String
+  tenantId   String
+  tenantName String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  property   Property @relation(fields: [propertyId], references: [id])
+  user       User     @relation(fields: [tenantId], references: [id])
+
+  @@map("reviews")
+}
+
+// Enums
+enum UserRole {
+  TENANT
+  LANDLORD
+  ADMIN
+}
+
+enum KycStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  STUDIO
+  VILLA
+  PENTHOUSE
+  CONDO
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum TransactionType {
+  RENT_PAYMENT
+  SECURITY_DEPOSIT
+  SERVICE_FEE
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
